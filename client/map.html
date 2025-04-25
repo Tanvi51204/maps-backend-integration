@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Navigation</title>
+    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .hero {
+            height: 80vh;
+            position: relative;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .search-bar-container {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-bar-container input {
+            width: 200px;
+            padding: 5px 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        .search-bar-container button {
+            padding: 6px 12px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .search-bar-container button:hover {
+            background-color: #1d4ed8;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="text-gray-100 bg-blue-600 body-font shadow-lg">
+        <div class="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
+            <a class="flex title-font font-medium items-center text-white mb-4 md:mb-0">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-12 h-12 text-white p-2 bg-blue-800 rounded-full" viewBox="0 0 24 24">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                </svg>
+                <span class="ml-3 text-2xl">IGDTUW Campus Maps</span>
+            </a>
+            <nav class="md:ml-auto flex flex-wrap items-center text-base justify-center">
+                <a class="mr-5 hover:text-gray-300" href="./blocks/admin.html">Admin Block</a>
+                <a class="mr-5 hover:text-gray-300" href="./blocks/computer_center.html">Computer Center</a>
+                <a class="mr-5 hover:text-gray-300" href="./blocks/ece.html">ECE/CSE Block</a>
+                <a class="mr-5 hover:text-gray-300" href="./blocks/it.html">IT Block</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <!-- Search Bar -->
+        <div class="search-bar-container">
+            <input id="search-bar" type="text" placeholder="Search for a building...">
+            <button onclick="updateMap()">Search</button>
+        </div>
+
+        <!-- Google Maps iframe -->
+        <iframe
+            id="map"
+            width="100%"
+        height="600"
+        style="border:0"
+            loading="lazy"
+            allowfullscreen
+            src = "https://www.google.com/maps/embed/v1/view?key=AIzaSyCELIyu1xbXueo5ckAwqVJNBA-zRa3CSHw&center=28.66467113146018, 77.23277339488446&zoom=19&maptype=satellite"
+            referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-gray-100 bg-blue-800 body-font">
+        <div class="container mx-auto py-4 flex flex-wrap flex-col sm:flex-row">
+            <p class="text-gray-300 text-sm text-center sm:text-left">© 2025 IGDTUW Campus Maps — All Rights Reserved</p>
+        </div>
+    </footer>
+
+    <script src="./script.js"></script>
+        
+</body>
+</html>

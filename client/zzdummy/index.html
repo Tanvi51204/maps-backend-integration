@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Navigation</title>
+    <style>
+
+         /* Global Styles */
+         body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 0;
+        }
+
+        h2 {
+            text-align: center;
+            color: #4A90E2;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: inline-block;
+            margin: 10px 0 5px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Container Styles */
+        #campus-view, #floor-view {
+            width: 90%;
+            max-width: 900px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            margin-bottom: 20px;
+        }
+
+        /* Map and Marker Styles */
+        #campus-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        #floor-container {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+        }
+        #campus-map {
+            width: 100%;
+            border-radius: 8px;
+        }
+
+        #floor-map {
+    width: 100%; /* Use full width of the container */
+    height: auto; /* Maintain aspect ratio */
+    max-height: 600px; /* Adjust height as needed */
+}
+        .marker {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background-color: #E94E77;
+            border-radius: 50%;
+            border: 2px solid #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .marker:hover {
+            transform: scale(1.2);
+        }
+
+        /* Tooltip for Room Information */
+        .room-info {
+            position: absolute;
+            background-color: #fff;
+            border: 1px solid #333;
+            padding: 8px;
+            border-radius: 5px;
+            max-width: 150px;
+            overflow-wrap: break-word;
+            display: none;
+            z-index: 10;
+        }
+
+        .marker:hover + .room-info {
+            display: block;
+        }
+
+        /* Form and Button Styles */
+        select, input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            color: #333;
+            background-color: #f8f8f8;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #fff;
+            background-color: #4A90E2;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #357ABD;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Campus Map Display -->
+    <div id="campus-view">
+        <h2>Campus Map</h2>
+        <div id="campus-container" style="position:relative;">
+            <img id="campus-map" src="campus map.png" alt="Campus Map">
+            <div id="department-marker" class="marker" style="display:none;"></div>
+        </div>
+        <label for="department">Select Department:</label>
+        <select id="department">
+            <option value="cs">Computer Science / ECE</option>
+            <option value="mech">Mechanical</option>
+            <option value="it">IT</option>
+            <option value="audi">Auditorium</option>
+            <option value="admin">Architecture</option>
+            <option value="krishna">Krishna Hostel</option>
+            <option value="kaveri">Kaveri Hostel</option>
+            <option value="canteen">Canteen</option>
+            <option value="cc">Computer Centre</option>
+            <option value="lib">Library</option>
+            <option value="parking">Parking</option>
+            <!-- Add more departments -->
+        </select>
+        <label for="room-number">Enter Room Number:</label>
+        <input type="text" id="room-number">
+        <button onclick="loadDepartment()">Next</button>
+    </div>
+
+   <!-- Floor Map Display -->
+   <div id="floor-view" style="display:none;">
+    <h2>Floor Plan</h2>
+    <div id="floor-container" style="position:relative;">
+        <img id="floor-map" src="" alt="Floor Plan">
+        <div id="room-marker" class="marker" style="display:none;"></div>
+        <div id= "room-info" class="room-info" ></div>
+    </div>
+    <button onclick="goBack()">Back to Campus Map</button>
+
+</div>
+
+    <script>
+         const roomData = {
+            'it' : {
+            //ground floor IT block
+            '101': { floor: 'All Block Layout/it0.png', top: '100px', left: '150px', info: 'Room 101 - Lecture Hall' },
+            '102': { floor: 'All Block Layout/it0.png', top: '80px', left: '200px', info: 'Room 102 - Lab' },
+            '103': { floor: 'All Block Layout/it0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '104': { floor: 'All Block Layout/it0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '105': { floor: 'All Block Layout/it0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '106': { floor: 'All Block Layout/it0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '107': { floor: 'All Block Layout/it0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '108': { floor: 'All Block Layout/it0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '109': { floor: 'All Block Layout/it0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '110': { floor: 'All Block Layout/it0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '111': { floor: 'All Block Layout/it0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '112': { floor: 'All Block Layout/it0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '113': { floor: 'All Block Layout/it0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '114': { floor: 'All Block Layout/it0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '115': { floor: 'All Block Layout/it0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '116': { floor: 'All Block Layout/it0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            //1st floor IT block
+            '201': { floor: 'All Block Layout/it1.png', top: '1034px', left: '535px', info: 'Room 101 - Lecture Hall' },
+            '202': { floor: 'All Block Layout/it1.png', top: '299.22916412353516px', left: '241px', info: 'Room 102 - Lab' },
+            '203': { floor: 'All Block Layout/it1.png', top: '248.22916412353516px', left: '241px', info: 'Room 201 - Office' },
+            '204': { floor: 'All Block Layout/it1.png', top: '274.22916412353516px', left: '122px', info: 'Room 201 - Office' },
+            '205': { floor: 'All Block Layout/it1.png', top: '160.22916412353516px', left: '84px', info: 'Room 201 - Office' },
+            '206': { floor: 'All Block Layout/it1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '207': { floor: 'All Block Layout/it1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '208': { floor: 'All Block Layout/it1.png', top: '166.22916412353516px', left: '294px', info: 'Room 201 - Office' },
+            '209': { floor: 'All Block Layout/it1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '210': { floor: 'All Block Layout/it1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '211': { floor: 'All Block Layout/it1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '212': { floor: 'All Block Layout/it1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '213': { floor: 'All Block Layout/it1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            // 2nd floor IT block
+            '301': { floor: 'All Block Layout/it2.png', top: '100px', left: '150px', info: 'Room 101 - Lecture Hall' },
+            '302': { floor: 'All Block Layout/it2.png', top: '80px', left: '200px', info: 'Room 102 - Lab' },
+            '303': { floor: 'All Block Layout/it2.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '304': { floor: 'All Block Layout/it2.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '305': { floor: 'All Block Layout/it2.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '306': { floor: 'All Block Layout/it2.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '307': { floor: 'All Block Layout/it2.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '308': { floor: 'All Block Layout/it2.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '309': { floor: 'All Block Layout/it2.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '310': { floor: 'All Block Layout/it2.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '311': { floor: 'All Block Layout/it2.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '312': { floor: 'All Block Layout/it2.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '313': { floor: 'All Block Layout/it2.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '314': { floor: 'All Block Layout/it2.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            // 3rd floor IT block
+            '401': { floor: 'All Block Layout/it3.png', top: '100px', left: '150px', info: 'Room 101 - Lecture Hall' },
+            '402': { floor: 'All Block Layout/it3.png', top: '80px', left: '200px', info: 'Room 102 - Lab' },
+            '403': { floor: 'All Block Layout/it3.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '404': { floor: 'All Block Layout/it3.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '405': { floor: 'All Block Layout/it3.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '406': { floor: 'All Block Layout/it3.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '407': { floor: 'All Block Layout/it3.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '408': { floor: 'All Block Layout/it3.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '409': { floor: 'All Block Layout/it3.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '410': { floor: 'All Block Layout/it3.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            },
+
+            'cs' : {
+            //ground floor cse block
+            '101': { floor: 'All Block Layout/ece0.png', top: '100px', left: '150px', info: 'Room 101 - Lecture Hall' },
+            '102': { floor: 'All Block Layout/ece0.png', top: '80px', left: '200px', info: 'Room 102 - Lab' },
+            '103': { floor: 'All Block Layout/ece0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '104': { floor: 'All Block Layout/ece0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '105': { floor: 'All Block Layout/ece0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '106': { floor: 'All Block Layout/ece0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '107': { floor: 'All Block Layout/ece0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '108': { floor: 'All Block Layout/ece0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '109': { floor: 'All Block Layout/ece0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '110': { floor: 'All Block Layout/ece0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '111': { floor: 'All Block Layout/ece0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '112': { floor: 'All Block Layout/ece0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '113': { floor: 'All Block Layout/ece0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '114': { floor: 'All Block Layout/ece0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '115': { floor: 'All Block Layout/ece0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '116': { floor: 'All Block Layout/ece0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            //1st floor cse block
+            '201': { floor: 'All Block Layout/ece1.png', top: '100px', left: '150px', info: 'Room 101 - Lecture Hall' },
+            '202': { floor: 'All Block Layout/ece1.png', top: '80px', left: '200px', info: 'Room 102 - Lab' },
+            '203': { floor: 'All Block Layout/ece1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '204': { floor: 'All Block Layout/ece1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '205': { floor: 'All Block Layout/ece1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '206': { floor: 'All Block Layout/ece1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '207': { floor: 'All Block Layout/ece1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '208': { floor: 'All Block Layout/ece1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '209': { floor: 'All Block Layout/ece1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '210': { floor: 'All Block Layout/ece1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '211': { floor: 'All Block Layout/ece1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '212': { floor: 'All Block Layout/ece1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '213': { floor: 'All Block Layout/ece1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            // 2nd floor cse block
+            '301': { floor: 'All Block Layout/ece2.png', top: '100px', left: '150px', info: 'Room 101 - Lecture Hall' },
+            '302': { floor: 'All Block Layout/ece2.png', top: '80px', left: '200px', info: 'Room 102 - Lab' },
+            '303': { floor: 'All Block Layout/ece2.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '304': { floor: 'All Block Layout/ece2.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '305': { floor: 'All Block Layout/ece2.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '306': { floor: 'All Block Layout/ece2.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '307': { floor: 'All Block Layout/ece2.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '308': { floor: 'All Block Layout/ece2.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '309': { floor: 'All Block Layout/ece2.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '310': { floor: 'All Block Layout/ece2.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '311': { floor: 'All Block Layout/ece2.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '312': { floor: 'All Block Layout/ece2.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '313': { floor: 'All Block Layout/ece2.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '314': { floor: 'All Block Layout/ece2.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            },
+            'admin' : {
+            //ground floor admin block
+            '101': { floor: 'All Block Layout/admin0.png', top: '100px', left: '150px', info: 'Room 101 - Lecture Hall' },
+            '102': { floor: 'All Block Layout/admin0.png', top: '80px', left: '200px', info: 'Room 102 - Lab' },
+            '103': { floor: 'All Block Layout/admin0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '104': { floor: 'All Block Layout/admin0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '105': { floor: 'All Block Layout/admin0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '106': { floor: 'All Block Layout/admin0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '107': { floor: 'All Block Layout/admin0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '108': { floor: 'All Block Layout/admin0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '109': { floor: 'All Block Layout/admin0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '110': { floor: 'All Block Layout/admin0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '111': { floor: 'All Block Layout/admin0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '112': { floor: 'All Block Layout/admin0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '113': { floor: 'All Block Layout/admin0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '114': { floor: 'All Block Layout/admin0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '115': { floor: 'All Block Layout/admin0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '116': { floor: 'All Block Layout/admin0.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            //1st floor cse block
+            '201': { floor: 'All Block Layout/admin1.png', top: '100px', left: '150px', info: 'Room 101 - Lecture Hall' },
+            '202': { floor: 'All Block Layout/admin1.png', top: '80px', left: '200px', info: 'Room 102 - Lab' },
+            '203': { floor: 'All Block Layout/admin1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '204': { floor: 'All Block Layout/admin1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '205': { floor: 'All Block Layout/admin1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '206': { floor: 'All Block Layout/admin1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '207': { floor: 'All Block Layout/admin1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '208': { floor: 'All Block Layout/admin1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '209': { floor: 'All Block Layout/admin1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '210': { floor: 'All Block Layout/admin1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '211': { floor: 'All Block Layout/admin1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '212': { floor: 'All Block Layout/admin1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            '213': { floor: 'All Block Layout/admin1.png', top: '120px', left: '220px', info: 'Room 201 - Office' },
+            }
+            // Add more rooms with corresponding floor images and coordinates
+        };
+
+
+    
+        function loadDepartment() {
+            const department = document.getElementById('department').value;
+            const roomNumber = document.getElementById('room-number').value;
+            const room = roomData[department][roomNumber];
+            if (room) {
+                // Set the floor map source and room marker position
+                document.getElementById('floor-map').src = room.floor;
+                document.getElementById('room-marker').style.top = room.top;
+                document.getElementById('room-marker').style.left = room.left;
+                document.getElementById('room-marker').style.display = 'block';
+                
+                // Show room info tooltip
+                const roomInfo = document.querySelector('.room-info');
+                roomInfo.textContent = room.info;
+                roomInfo.style.top = `calc(${room.top} + 30px)`; // Position the info below the marker
+                roomInfo.style.left = room.left;
+                roomInfo.style.display = 'block';
+
+                // Display the floor view and hide the campus view
+                document.getElementById('campus-view').style.display = 'none';
+                document.getElementById('floor-view').style.display = 'block';
+            } else {
+                alert('Room number not found. Please try again.');
+            }
+        }
+
+        function goBack() {
+    document.getElementById('campus-view').style.display = 'block';
+    document.getElementById('floor-view').style.display = 'none';
+    document.getElementById('room-info').style.display = 'none';
+    document.getElementById('room-marker').style.display = 'none';
+    document.getElementById('room-number').value = ''; // Clear room number
+}
+
+
+    </script>
+
+</body>
+</html>

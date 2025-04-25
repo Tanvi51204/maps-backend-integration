@@ -1,0 +1,431 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECE/CSE Block Navigation</title>
+    <link rel="stylesheet" href="blocks.css">
+    <style>
+        
+        #floor-plan-container {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        #floor-plan-image {
+            width: 100%;
+            height: auto;
+        }
+
+        #floor-plan-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .input-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .input-container input {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>ECE/CSE Block Navigation</h1>
+    <div class="input-container">
+        <p>Enter your current location (room number):</p>
+        <input type="text" id="current-room" placeholder="Enter Current Room Number">
+        <p>Enter the destination room number:</p>
+        <input type="text" id="destination-room" placeholder="Enter Destination Room Number">
+        <button onclick="highlightRooms()">Highlight Rooms</button>
+    </div>
+
+    <div id="floor-plan-container">
+        <img id="floor-plan-image" alt="-   -   -    -   -   - Hello! Enter the room numbers to get your path!-    -   -   -    -   -   -">
+        <canvas id="floor-plan-canvas"></canvas>
+    </div>
+
+    <script>
+        // Floor plan mapping: floor number to image and JSON file
+        const floorData = {
+            "1": {
+                "image": "../floorplans/ece_floor_1.png",
+                "coordinates": "../room_coordinates/ece_floor_1.json"
+            },
+            "2": {
+                "image": "../floorplans/ece_floor_2.png",
+                "coordinates": "../room_coordinates/ece_floor_2.json"
+            },
+            "3": {
+                "image": "../floorplans/ece_floor_3.png",
+                "coordinates": "../room_coordinates/ece_floor_3.json"
+            }
+        };
+
+        let roomCoordinates = {};
+
+        window.highlightRooms = function () {
+            const currentRoom = document.getElementById("current-room").value;
+            const destinationRoom = document.getElementById("destination-room").value;
+
+            if (!currentRoom || !destinationRoom) {
+                alert("Please enter both current and destination room numbers.");
+                return;
+            }
+
+            // Determine floors based on room numbers
+            const currentFloor = currentRoom.startsWith("1") ? "1" :
+                                 currentRoom.startsWith("2") ? "2" : 
+                                 currentRoom.startsWith("3") ? "3" : null;
+
+            const destinationFloor = destinationRoom.startsWith("1") ? "1" :
+                                     destinationRoom.startsWith("2") ? "2" : 
+                                     destinationRoom.startsWith("3") ? "3" : null;
+
+            if (!currentFloor || !destinationFloor) {
+                alert("Invalid room numbers! Please enter valid room numbers.");
+                return;
+            }
+
+            if (currentFloor !== destinationFloor) {
+                alert("Source and destination must be on the same floor for now.");
+                return;
+            }
+
+            const floorInfo = floorData[currentFloor];
+            fetch(floorInfo.coordinates)
+                .then(response => response.json())
+                .then(data => {
+                    roomCoordinates = data;
+
+                    if (!roomCoordinates[currentRoom]) {
+                        alert("Current room number not found on this floor!");
+                        return;
+                    }
+
+                    if (!roomCoordinates[destinationRoom]) {
+                        alert("Destination room number not found on this floor!");
+                        return;
+                    }
+
+                    const image = document.getElementById("floor-plan-image");
+                    const canvas = document.getElementById("floor-plan-canvas");
+                    const ctx = canvas.getContext("2d");
+
+                    // Update the floor plan image dynamically
+                    image.src = floorInfo.image;
+
+                    // Wait for the image to load before drawing
+                    image.onload = () => {
+                        canvas.width = image.clientWidth;
+                        canvas.height = image.clientHeight;
+
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                        // Highlight current location
+                        const current = roomCoordinates[currentRoom];
+                        const cx1 = current.x1 * canvas.width;
+                        const cy1 = current.y1 * canvas.height;
+                        const cx2 = current.x2 * canvas.width;
+                        const cy2 = current.y2 * canvas.height;
+
+                        ctx.strokeStyle = "blue";
+                        ctx.lineWidth = 3;
+                        ctx.strokeRect(cx1, cy1, cx2 - cx1, cy2 - cy1);
+                        ctx.fillStyle = "blue";
+                        ctx.font = "16px Arial";
+                        ctx.fillText(currentRoom, cx1, cy1 - 5);
+
+                        // Highlight destination location
+                        const destination = roomCoordinates[destinationRoom];
+                        const dx1 = destination.x1 * canvas.width;
+                        const dy1 = destination.y1 * canvas.height;
+                        const dx2 = destination.x2 * canvas.width;
+                        const dy2 = destination.y2 * canvas.height;
+
+                        ctx.strokeStyle = "red";
+                        ctx.lineWidth = 3;
+                        ctx.strokeRect(dx1, dy1, dx2 - dx1, dy2 - dy1);
+                        ctx.fillStyle = "red";
+                        ctx.fillText(destinationRoom, dx1, dy1 - 5);
+
+                        // Add clickable link for the destination room
+                        const roomLink = document.createElement("a");
+                        roomLink.href = `https://drive.google.com/dummy/${destinationRoom}`;
+                        roomLink.style.position = "absolute";
+                        roomLink.style.top = `${dy1}px`;
+                        roomLink.style.left = `${dx1}px`;
+                        roomLink.style.width = `${dx2 - dx1}px`;
+                        roomLink.style.height = `${dy2 - dy1}px`;
+                        roomLink.style.zIndex = "10";
+                        roomLink.style.display = "block";
+
+                        document.getElementById("floor-plan-container").appendChild(roomLink);
+                    };
+                })
+                .catch(error => {
+                    console.error("Error loading coordinates:", error);
+                    alert("Could not load room coordinates.");
+                });
+        }; 
+    </script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ECE/CSE Block Navigation</title>
+    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        #floor-plan-container {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+
+        #floor-plan-image {
+            width: 100%;
+            height: auto;
+        }
+
+        #floor-plan-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <!-- Header -->
+    <header class="text-gray-100 bg-blue-600 body-font shadow-lg">
+        <div class="container mx-auto flex flex-wrap p-5 flex-col md:flex-row items-center">
+            <a class="flex title-font font-medium items-center text-white mb-4 md:mb-0">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-12 h-12 text-white p-2 bg-blue-800 rounded-full" viewBox="0 0 24 24">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+                </svg>
+                <span class="ml-3 text-2xl">ECE/CSE Block Navigation</span>
+            </a>
+            <nav class="md:ml-auto flex flex-wrap items-center text-base justify-center">
+                <a class="mr-5 hover:text-gray-300" href="../index.html">Home</a>
+                <a class="mr-5 hover:text-gray-300" href="../blocks/computer_center.html">Computer Center</a>
+                <a class="mr-5 hover:text-gray-300" href="../blocks/it.html">IT Block</a>
+                <a class="mr-5 hover:text-gray-300" href="../blocks/admin_block.html">Admin Block</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <div class="hero relative bg-blue-700 text-white py-20">
+        <div class="container mx-auto text-center">
+            <h1 class="text-4xl font-bold mb-4">Welcome to the ECE/CSE Block</h1>
+            <p class="text-lg">Navigate through the ECE/CSE block with ease. Enter room numbers to get started!</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="bg-white shadow rounded-lg p-6">
+            <h2 class="text-2xl font-bold mb-4 text-blue-700">Room Navigation</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2" for="current-room">Enter your current location (room number):</label>
+                    <input class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" type="text" id="current-room" placeholder="Enter Current Room Number">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2" for="destination-room">Enter the destination room number:</label>
+                    <input class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600" type="text" id="destination-room" placeholder="Enter Destination Room Number">
+                </div>
+            </div>
+            <button onclick="highlightRooms()" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">Highlight Rooms</button>
+        </div>
+
+        <div id="floor-plan-container" class="mt-8">
+            <img id="floor-plan-image" alt="Floor plan image will appear here">
+            <canvas id="floor-plan-canvas"></canvas>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="text-gray-100 bg-blue-800 body-font mt-12">
+        <div class="container mx-auto py-4 flex flex-wrap flex-col sm:flex-row">
+            <p class="text-gray-300 text-sm text-center sm:text-left">© 2025 IGDTUW Campus Maps — All Rights Reserved</p>
+            <span class="inline-flex sm:ml-auto sm:mt-0 mt-2 justify-center sm:justify-start">
+                <a class="text-gray-300 hover:text-white ml-3" href="#">
+                    <svg fill="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="w-5 h-5" viewBox="0 0 24 24">
+                        <path d="M18.36 2.64a9 9 0 00-12.72 0M16.24 6.76a6 6 0 00-8.48 0m-1.42 1.42a3 3 0 004.24 0"></path>
+                        <path d="M12 20.88v-3m0-5a4 4 0 100-8 4 4 0 000 8zm0 2v3"></path>
+                    </svg>
+                </a>
+            </span>
+        </div>
+    </footer>
+
+    <script>
+        // Floor plan mapping: floor number to image and JSON file
+        const floorData = {
+            "1": {
+                "image": "../floorplans/ece_floor_1.png",
+                "coordinates": "../room_coordinates/ece_floor_1.json"
+            },
+            "2": {
+                "image": "../floorplans/ece_floor_2.png",
+                "coordinates": "../room_coordinates/ece_floor_2.json"
+            },
+            "3": {
+                "image": "../floorplans/ece_floor_3.png",
+                "coordinates": "../room_coordinates/ece_floor_3.json"
+            }
+        };
+
+        let roomCoordinates = {};
+
+        window.highlightRooms = function () {
+            const currentRoom = document.getElementById("current-room").value;
+            const destinationRoom = document.getElementById("destination-room").value;
+
+            if (!currentRoom || !destinationRoom) {
+                alert("Please enter both current and destination room numbers.");
+                return;
+            }
+
+            // Determine floors based on room numbers
+            const currentFloor = currentRoom.startsWith("1") ? "1" :
+                                 currentRoom.startsWith("2") ? "2" : 
+                                 currentRoom.startsWith("3") ? "3" : null;
+
+            const destinationFloor = destinationRoom.startsWith("1") ? "1" :
+                                     destinationRoom.startsWith("2") ? "2" : 
+                                     destinationRoom.startsWith("3") ? "3" : null;
+
+            if (!currentFloor || !destinationFloor) {
+                alert("Invalid room numbers! Please enter valid room numbers.");
+                return;
+            }
+
+            // if (currentFloor !== destinationFloor) {
+            //     alert("Source and destination must be on the same floor for now.");
+            //     return;
+            // }
+
+
+            if (currentFloor !== destinationFloor) {
+    const floorDiff = Math.abs(parseInt(destinationFloor) - parseInt(currentFloor));
+    const direction = parseInt(destinationFloor) > parseInt(currentFloor) ? "climb" : "descend";
+    const flightText = floorDiff === 1 ? "one flight" : `${floorDiff} flights`;
+    alert(`Please ${direction} ${flightText} of stairs to reach the destination.`);
+
+    // Now switch to the destination floor's image and highlight only the destination room
+    const floorInfo = floorData[destinationFloor];
+    fetch(floorInfo.coordinates)
+        .then(response => response.json())
+        .then(data => {
+            roomCoordinates = data;
+
+            if (!roomCoordinates[destinationRoom]) {
+                alert("Destination room number not found on that floor!");
+                return;
+            }
+
+            const image = document.getElementById("floor-plan-image");
+            const canvas = document.getElementById("floor-plan-canvas");
+            const ctx = canvas.getContext("2d");
+
+            image.src = floorInfo.image;
+
+            image.onload = () => {
+                canvas.width = image.clientWidth;
+                canvas.height = image.clientHeight;
+
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                const destination = roomCoordinates[destinationRoom];
+                const dx1 = destination.x1 * canvas.width;
+                const dy1 = destination.y1 * canvas.height;
+                const dx2 = destination.x2 * canvas.width;
+                const dy2 = destination.y2 * canvas.height;
+
+                ctx.strokeStyle = "red";
+                ctx.lineWidth = 3;
+                ctx.strokeRect(dx1, dy1, dx2 - dx1, dy2 - dy1);
+                ctx.fillStyle = "red";
+                ctx.font = "16px Arial";
+                ctx.fillText(destinationRoom, dx1, dy1 - 5);
+            };
+        })
+        .catch(error => console.error(error));
+
+    return;
+}
+
+
+            const floorInfo = floorData[currentFloor];
+            fetch(floorInfo.coordinates)
+                .then(response => response.json())
+                .then(data => {
+                    roomCoordinates = data;
+
+                    if (!roomCoordinates[currentRoom]) {
+                        alert("Current room number not found on this floor!");
+                        return;
+                    }
+
+                    if (!roomCoordinates[destinationRoom]) {
+                        alert("Destination room number not found on this floor!");
+                        return;
+                    }
+
+                    const image = document.getElementById("floor-plan-image");
+                    const canvas = document.getElementById("floor-plan-canvas");
+                    const ctx = canvas.getContext("2d");
+
+                    image.src = floorInfo.image;
+
+                    image.onload = () => {
+                        canvas.width = image.clientWidth;
+                        canvas.height = image.clientHeight;
+
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                        const current = roomCoordinates[currentRoom];
+                        const cx1 = current.x1 * canvas.width;
+                        const cy1 = current.y1 * canvas.height;
+                        const cx2 = current.x2 * canvas.width;
+                        const cy2 = current.y2 * canvas.height;
+
+                        ctx.strokeStyle = "blue";
+                        ctx.lineWidth = 3;
+                        ctx.strokeRect(cx1, cy1, cx2 - cx1, cy2 - cy1);
+                        ctx.fillStyle = "blue";
+                        ctx.font = "16px Arial";
+                        ctx.fillText(currentRoom, cx1, cy1 - 5);
+
+                        const destination = roomCoordinates[destinationRoom];
+                        const dx1 = destination.x1 * canvas.width;
+                        const dy1 = destination.y1 * canvas.height;
+                        const dx2 = destination.x2 * canvas.width;
+                        const dy2 = destination.y2 * canvas.height;
+
+                        ctx.strokeStyle = "red";
+                        ctx.strokeRect(dx1, dy1, dx2 - dx1, dy2 - dy1);
+                        ctx.fillStyle = "red";
+                        ctx.fillText(destinationRoom, dx1, dy1 - 5);
+                    };
+                })
+                .catch(error => console.error(error));
+        };
+    </script>
+</body>
+</html>

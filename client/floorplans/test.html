@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Floor Plan - Room Selector</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        canvas {
+            border: 1px solid black;
+            width: 100%;  /* Make canvas responsive */
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Select Rooms on the Floor Plan</h1>
+    <canvas id="floorCanvas"></canvas>
+    <button onclick="downloadCoordinates()">Download Coordinates</button>
+    <script>
+        const canvas = document.getElementById('floorCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let roomCoordinates = {};
+        let isDrawing = false;
+        let startX, startY;
+
+        const img = new Image();
+        img.src = 'ece_floor_3.png'; // Your image path here
+
+        // Resize canvas on image load
+        img.onload = () => {
+            resizeCanvas();
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height); // Draw the image on canvas, fitting it to the canvas size
+        };
+
+        // Resizing canvas for different screen sizes
+        window.addEventListener('resize', resizeCanvas);
+
+        function resizeCanvas() {
+            // Set canvas size to fill the screen, adjusting based on image aspect ratio
+            const aspectRatio = img.width / img.height;
+            canvas.width = window.innerWidth;
+            canvas.height = canvas.width / aspectRatio;
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height); // Redraw the image at the new size
+        }
+
+        canvas.addEventListener('mousedown', (event) => {
+            const { offsetX, offsetY } = event;
+            startX = offsetX;
+            startY = offsetY;
+            isDrawing = true;
+        });
+
+        canvas.addEventListener('mousemove', (event) => {
+            if (isDrawing) {
+                const { offsetX, offsetY } = event;
+                ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height); // Redraw the image
+                ctx.strokeStyle = 'green';
+                ctx.lineWidth = 2;
+                ctx.strokeRect(startX, startY, offsetX - startX, offsetY - startY);
+            }
+        });
+
+        canvas.addEventListener('mouseup', (event) => {
+            const { offsetX, offsetY } = event;
+            isDrawing = false;
+            const roomNumber = prompt('Enter room number:');
+            if (roomNumber) {
+                // Store the room coordinates as proportional to the image size
+                roomCoordinates[roomNumber] = {
+                    x1: startX / canvas.width,  // Proportional value
+                    y1: startY / canvas.height, // Proportional value
+                    x2: offsetX / canvas.width, // Proportional value
+                    y2: offsetY / canvas.height // Proportional value
+                };
+                console.log('Room Coordinates:', roomCoordinates);
+            }
+        });
+
+        // Function to convert proportional coordinates back to pixels (when needed)
+        function getPixelCoordinates(roomNumber) {
+            const room = roomCoordinates[roomNumber];
+            return {
+                x1: room.x1 * canvas.width,
+                y1: room.y1 * canvas.height,
+                x2: room.x2 * canvas.width,
+                y2: room.y2 * canvas.height
+            };
+        }
+        function downloadCoordinates() {
+        const dataStr = JSON.stringify(roomCoordinates);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'room_coordinates.json';
+        
+        link.click();
+    }
+
+    </script>
+</body>
+</html>

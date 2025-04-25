@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campus Navigation</title>
+    <style>
+        #campus-map, #floor-map {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .marker {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: red;
+            border-radius: 50%;
+        }
+
+        .room-info {
+            display: none;
+            position: absolute;
+            background-color: white;
+            border: 1px solid black;
+            padding: 10px;
+        }
+
+        .marker:hover + .room-info {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Department Selection -->
+    <div id="welcome">
+        <label for="department">Select Department:</label>
+        <select id="department">
+            <option value="cs">Computer Science / ECE</option>
+            <option value="mech">Mechanical</option>
+            <option value="mech">IT</option>
+            <option value="mech">Management</option>
+            <!-- Add more departments -->
+        </select>
+        <button onclick="loadDepartment()">Next</button>
+    </div>
+
+    <!-- Campus Map Display -->
+    <div id="campus-view" style="display:none;">
+        <h3>Campus Plan</h3>
+        <div id="campus-container" style="position:relative;">
+            <img id="campus-map" src="campus map.png" alt="Campus Map">
+            <div id="department-marker" class="marker" style="top: 167.0625px; left: 482px;"></div>
+        </div>
+        <button onclick="enterRoomNumber()">Next</button>
+    </div>
+
+    <!-- Floor Map Display -->
+    <div id="floor-view" style="display:none;">
+        <h3>Floor Plan</h3>
+        <div id="floor-container" style="position:relative;">
+            <img id="floor-map" src="floor1.jpg" alt="Floor Plan">
+            <div id="room-marker" class="marker" style="top:100px; left:150px;" onclick="showRoomInfo()"></div>
+            <div class="room-info" style="top:120px; left:170px;">Room 101 - Lecture Hall</div>
+        </div>
+    </div>
+
+    <script>
+        function loadDepartment() {
+            var dept = document.getElementById("department").value;
+            document.getElementById("welcome").style.display = "none";
+            document.getElementById("campus-view").style.display = "block";
+
+            // Change marker position based on department
+            if (dept === 'cs') {
+                document.getElementById("department-marker").style.top = "445px";
+                document.getElementById("department-marker").style.left = "218px";
+            } else if (dept === 'mech') {
+                document.getElementById("department-marker").style.top = "150px";
+                document.getElementById("department-marker").style.left = "300px";
+            }
+        }
+
+        function enterRoomNumber() {
+            document.getElementById("campus-view").style.display = "none";
+            document.getElementById("floor-view").style.display = "block";
+
+            // Based on room number selection (hard-coded example for now)
+            var room = prompt("Enter Room Number:");
+            if (room === '101') {
+                document.getElementById("room-marker").style.top = "100px";
+                document.getElementById("room-marker").style.left = "150px";
+            }
+        }
+
+        function showRoomInfo() {
+            alert("Room 101 - Lecture Hall. Capacity: 50.");
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Marker Position</title>
+    <style>
+        #map {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+        }
+    </style>
+</head>
+<body>
+    <h3>Click on the image to get the position</h3>
+    <img id="map" src="All Block Layout/it1.png" alt="Campus Map" onclick="getPosition(event)">
+    <p id="position"></p>
+
+    <script>
+        function getPosition(event) {
+            const map = document.getElementById('map');
+            const rect = map.getBoundingClientRect();
+            const x = event.clientX - rect.left; // x position within the image
+            const y = event.clientY - rect.top;  // y position within the image
+            
+            document.getElementById('position').textContent = 'Top: ' + y + 'px, Left: ' + x + 'px';
+        }
+
+    </script>
+</body>
+</html>

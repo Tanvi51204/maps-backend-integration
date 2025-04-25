@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login / Register</title>
+    <link rel="stylesheet" href="style.css"> <!-- Link your CSS file -->
+</head>
+<body>
+
+    <div class="auth-container">
+
+        <!-- Login Form (Visible by default) -->
+        <form id="login-form" class="auth-form">
+            <h2>Login</h2>
+            <div class="form-group">
+                <label for="login-email">Email:</label>
+                <input type="email" id="login-email" name="email" required placeholder="your.email@igdtuw.ac.in">
+            </div>
+            <div class="form-group">
+                <label for="login-password">Password:</label>
+                <input type="password" id="login-password" name="password" required>
+            </div>
+            <button type="submit">Login</button>
+            <p class="toggle-link">
+                Don't have an account? <a href="#" id="show-register">Register here</a>
+            </p>
+        </form>
+
+        <!-- Registration Form (Hidden by default) -->
+        <form id="register-form" class="auth-form hidden">
+            <h2>Register</h2>
+            <div class="form-group">
+                <label for="register-username">Username:</label>
+                <input type="text" id="register-username" name="username" required>
+            </div>
+             <div class="form-group">
+                <label for="register-fullname">Full Name:</label>
+                <input type="text" id="register-fullname" name="fullName"> <!-- Optional field based on your backend -->
+            </div>
+            <div class="form-group">
+                <label for="register-email">Email:</label>
+                <input type="email" id="register-email" name="email" required placeholder="your.name@igdtuw.ac.in">
+                 <small>Must be a valid @igdtuw.ac.in email.</small>
+            </div>
+            <div class="form-group">
+                <label for="register-password">Password:</label>
+                <input type="password" id="register-password" name="password" required>
+            </div>
+            <button type="submit">Register</button>
+            <p class="toggle-link">
+                Already have an account? <a href="#" id="show-login">Login here</a>
+            </p>
+        </form>
+
+        <!-- Area to display messages (errors or success) -->
+        <div id="auth-message" class="message-area"></div>
+
+    </div>
+
+    <script src="script_auth.js"></script> <!-- Link your JavaScript file -->
+</body>
+</html>
