@@ -276,6 +276,10 @@
     <script>
         // Floor plan mapping: floor number to image and JSON file
         const floorData = {
+            "entrance": {
+                "image": "../floorplans/ece_floor_1.png",
+                "coordinates": "../room_coordinates/ece_floor_1.json"
+            },
             "1": {
                 "image": "../floorplans/ece_floor_1.png",
                 "coordinates": "../room_coordinates/ece_floor_1.json"
@@ -302,7 +306,8 @@
             }
 
             // Determine floors based on room numbers
-            const currentFloor = currentRoom.startsWith("1") ? "1" :
+            const currentFloor = currentRoom.startsWith("e") ? "1" : 
+            currentRoom.startsWith("1") ? "1" :
                                  currentRoom.startsWith("2") ? "2" : 
                                  currentRoom.startsWith("3") ? "3" : null;
 
